@@ -190,11 +190,11 @@ cat passwd
 - Use [grafana2hashcat](https://github.com/iamaldi/grafana2hashcat) to convert the password hash into a format interpretable by Hashcat and crack it to get the plaintext.
 
 # Post-Exploitation
-!(ssh as boris to target)[\images\Data\ssh_to_target.png]
+![ssh as boris to target](\images\Data\ssh_to_target.png)
 - SSH into the target server as boris to find the user.txt flag. Password reuse is confirmed here (SSH and SQL database)
 
 ## User Permissions
-!(boris permissions)[\images\Data\boris_permissions.png]
+![boris permissions](\images\Data\boris_permissions.png)
 - We can run the command `/snap/bin/docker.exe` **as root without any password authentication**. **Any arguments** can be passed to docker.exe.
 
 ![etc/passwd contents on target server](\images\Data\etc_passwd2.png)
