@@ -56,10 +56,10 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.png
+favicon: /images/favicon.png
 
 avatar:
-  img: /img/butterfly-icon.png
+  img: /images/avatar.jpg
   effect: false
 
 # Disable all banner images
@@ -293,7 +293,7 @@ aside:
     button:
       enable: true
       icon: fab fa-github
-      text: Follow Me
+      text: 
       link: https://github.com/jon1oh
   card_announcement:
     enable: true

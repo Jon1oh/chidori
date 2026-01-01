@@ -214,11 +214,11 @@ cat passwd
 - In the bash shell on the container, we can modify the contents of `/etc/hostname` to an arbitrary value. As boris in the SSH session, we can read the new contents of the `hostname` file **on the host machine**.
 - As a low-privileged user, we can abuse this by modifying the value of the host machine’s `hostname` file to an executable file and get root access.
 
-![Set global-write permissions on /etc/hostname](\images\Data\chmod_777_etc_hostname)
+![Set global-write permissions on /etc/hostname](\images\Data\chmod_777_etc_hostname.png)
 - In the bash shell on the container, set **world-writable permissions** on the `/etc/hostname` file.
 - In the SSH session as boris, redirect the `/var/snap/docker/common/.../hostname` directory to the `/bin/bash` binary on the container. The container’s `/etc/hostname` file is now overwritten with the contents of the bash binary.
 
-![Set world-writable permissions on /etc/hostname](\images\Data\chmod_777_etc_hostname)
+![Set world-writable permissions on /etc/hostname](\images\Data\chmod_777_etc_hostname.png)
 - In the container, set `/etc/hostname` with world-writable privileges, the SUID and change its owner to root.
 - In the SSH session as boris, redirect the `/var/snap/docker/common/.../hostname` directory to the `/bin/bash` binary on the container. The container’s `/etc/hostname` file is now overwritten with the contents of the bash binary.
 - We can now access the host server as root.
