@@ -11,17 +11,54 @@ Data is an easy lab from VulnLabs. Learn to exploit the CVE-2021-23798 on Grafan
 
 # Enumeration
 
-![Nmap scan](\images\Data\nmap.png)
 ```bash
-nmap -p- -A 10.10.108.123
+jon@kali:~$ nmap -p- -A data.vl
+
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-12 11:25 +08
+Nmap scan report for data.vl (10.10.108.123)
+Host is up (0.17s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 da:17:e0:9b:7f:24:67:61:a1:f3:83:15:df (RSA)
+|   256 56:46:39:5d:6c:3f:7f:1f:20:ad (ECDSA)
+|   256 5a:d7:00:6f:fe:ac:71:f7:66:c2:60:00:df:68:fd:c2 (ED25519)
+3000/tcp open  http    Grafana
+|_http-robots.txt: 1 disallowed entry 
+|_http-trane-info: Problem with XML parsing of /evox/about
+|_http-title: Grafana
+|_http-login: Requested resource /login
+Device type: general purpose
+Running: Linux 4.X
+OS CPE: cpe:/o:linux:linux_kernel:4.15
+OS details: Linux 4.15
+Network Distance: 2 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using port 53/tcp)
+HOP RTT      ADDRESS
+1   158.95 ms 10.8.0.1
+2   160.16 ms data.vl (10.10.108.123)
+
+Nmap done: 1 IP address (1 host up) scanned in 448.51 seconds
 ```
 - The target IP address is 10.10.108.123. Ports 22 and 3000 are open.
 
 ## SSH (22)
 
-![SSH password authentication](\images\Data\ssh.png)
 ```bash
-ssh jon@data.vl
+(jon㉿kali)-[~/vulnLab/data]$ ssh jon@data.vl
+The authenticity of host 'data.vl (10.10.108.123)' can't be established.
+ED25519 key fingerprint is SHA256:RalTyqLHjCzX4eqW0S1LHBULmLSuztwmtIUF+jDGFWE.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'data.vl' (ED25519) to the list of known hosts.
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+jon@data.vl's password: 
+Permission denied, please try again.
 ```
 - Password authentication is enabled on the target server. If a password is found later, test it for password reuse.
 
