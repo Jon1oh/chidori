@@ -13,7 +13,8 @@ timezone: 'Asia/Singapore'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://jon1oh.github.io/chidori.io
+root: /chidori.io/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -40,7 +41,7 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true # Create asset folder for each post. Same name as post.
 relative_link: false
 future: true
 syntax_highlighter: highlight.js
@@ -105,4 +106,6 @@ theme: butterfly
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/jon1oh/chidori.io.git
+  branch: main
