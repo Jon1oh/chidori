@@ -108,4 +108,4 @@ theme: butterfly
 deploy:
   type: git
   repo: https://github.com/jon1oh/chidori.io.git
-  branch: main
+  branch: master
