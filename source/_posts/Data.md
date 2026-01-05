@@ -5,6 +5,7 @@ categories: ["VulnLab"]
 tags: ["Web", "Grafana", "SSH", "sqlite3", "Docker"]
 cover: \images\Data\data_vl.png
 ---
+
 # TLDR
 Data is an easy lab from VulnLabs. Learn to exploit the CVE-2021-23798 on Grafana, analyse database files and abuse excessive Docker privileges to escalate to root from a container to the host machine.
 
