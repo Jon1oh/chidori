@@ -62,7 +62,7 @@ avatar:
 disable_top_img: false
 
 # If the banner of page not setting, it will show the default_top_img
-default_top_img:
+default_top_img: /images/izanagi.jpg
 
 # The banner image of index page
 index_img: /images/izanagi.jpg
@@ -280,7 +280,7 @@ aside:
   button: true
   mobile: true
   # Position: left / right
-  position: right
+  position: left
   display:
     archive: true
     tag: true
@@ -317,7 +317,7 @@ aside:
   card_tags:
     enable: true
     # If set 0 will show all
-    limit: 40
+    limit: 8
     color: true
     # Order of tags, random/name/length
     orderby: random
