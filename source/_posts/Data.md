@@ -2,8 +2,8 @@
 title: Data
 date: 2025-12-31 13:16:55
 categories: ["VulnLab"]
-tags: ["Web", "Grafana", "SSH", "sqlite3", "Docker"]
-cover: \images\Data\data_vl.png
+tags: ["Web", "Grafana", "SSH", "sqlite3", "Docker", "Directory Traversal", "Arbitrary File Read", "Passsword Reuse", "Insecure User Permissions"]
+cover: https://assets.vulnlab.com/data_slide.png
 ---
 
 # TLDR
