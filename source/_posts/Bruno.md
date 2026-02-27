@@ -6,7 +6,8 @@ tags: ["DLL Hijacking", "FTP Anonymous Login", "Kerberos Authentication Misconfi
 cover: https://assets.vulnlab.com/bruno_slide.png
 ---
 # TLDR
-
+Enumerate the domain and perform DLL Hijacking to access the domain.
+Abuse Active Directory misconfigurations to reach root.
 
 # Enumeration 
 ```bash
