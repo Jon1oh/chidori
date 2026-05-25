@@ -73,7 +73,7 @@ Nmap done: 1 IP address (1 host up) scanned in 27.18 seconds
 Starting with ports 21, 53, 80 and 88, FTP anonymous login is allowed and we can see the folders on the FTP server. Kerberos is running on port 88.
 
 ```bash
-(kali@kali)-[~]$ $ sudo nmap -p135,3389,5985 -sC -sV bruno.vl
+(kali@kali)-[~]$ sudo nmap -p135,3389,5985 -sC -sV bruno.vl
 Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-13 23:47 EST
 Nmap scan report for bruno.vl (10.10.99.171)
 Host is up (0.16s latency).
@@ -841,30 +841,30 @@ This lab was definitely a challenge for me. No just technically, but mentally to
 
 # References
 ## Blogs
-1. HackTricks - Pentesting FTP (21) [https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-ftp/index.html]
+1. [HackTricks - Pentesting FTP (21)](https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-ftp/index.html)
 
-2. BloodHound Community Edition (CE) [https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart]
+2. [BloodHound Community Edition (CE)](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart)
 
-3. ZipSlip Attack Explained [https://medium.com/@ibm_ptc_security/zip-slip-attack-e3e63a13413f]
+3. [ZipSlip Attack Explained](https://medium.com/@ibm_ptc_security/zip-slip-attack-e3e63a13413f)
 
-4. jd Bruno VulnLab [https://jd-apprentice.github.io/hexo-sample/2024/08/02/bruno/index.html]
+4. [jd Bruno VulnLab](https://jd-apprentice.github.io/hexo-sample/2024/08/02/bruno/index.html)
 
-5. Vendetta0 Bruno VulnLab [https://medium.com/@Vendetta0/vulnlab-bruno-4df7d80247b0]
+5. [Vendetta0 Bruno VulnLab](https://medium.com/@Vendetta0/vulnlab-bruno-4df7d80247b0)
 
 ## Tools
-1. dnSpy [https://github.com/dnSpyEx/dnSpy]
+1. [dnSpy](https://github.com/dnSpyEx/dnSpy)
 
-2. evilarc [https://github.com/ptoomey3/evilarc]
+2. [evilarc](https://github.com/ptoomey3/evilarc)
 
-3. winPeas [https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS]
+3. [winPeas](https://github.com/peass-ng/PEASS-ng/tree/master/winPEAS)
 
-4. KrbRelayUp [https://github.com/Dec0ne/KrbRelayUp]
+4. [KrbRelayUp](https://github.com/Dec0ne/KrbRelayUp)
 
-5. CLSID list [https://github.com/jkerai1/CLSID-Lookup/blob/main/CLSID_no_duplicate_records.txt]
+5. [CLSID list](https://github.com/jkerai1/CLSID-Lookup/blob/main/CLSID_no_duplicate_records.txt)
 
 ## Videos
-1. Learning Reverse Engineering [https://www.youtube.com/watch?v=gh2RXE9BIN8]
+1. [Learning Reverse Engineering](https://www.youtube.com/watch?v=gh2RXE9BIN8)
 
-2. How to download DnSpy on Windows [https://www.youtube.com/watch?v=2DzIPq8ZGnY]
+2. [How to download DnSpy on Windows](https://www.youtube.com/watch?v=2DzIPq8ZGnY)
 
-3. How to open and analyze DLL files in DnSpy [https://www.youtube.com/watch?v=ANL5Gw2216o]
+3. [How to open and analyze DLL files in DnSpy](https://www.youtube.com/watch?v=ANL5Gw2216o)
