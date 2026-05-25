@@ -3,7 +3,7 @@ title: Escape
 date: 2026-01-27 11:35:12
 categories: ["VulnLab"]
 tags: ["Insecure AppLocker Configurations", "Insecure Windows Kiosk Configurations"]
-cover: https://assets.vulnlab.com/escape_slide.png
+cover: \images\Escape\escape_vl.png
 ---
 
 # TLDR

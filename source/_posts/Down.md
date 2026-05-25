@@ -3,7 +3,7 @@ title: Down
 date: 2026-01-05 15:09:56
 categories: ["VulnLab"]
 tags: ["Web", "SSRF","SSH", "php", "pswm", "Insecure Web Design"]
-cover: https://assets.vulnlab.com/down_slide.png
+cover: images\Down\down_vl.png
 ---
 
 # TLDR

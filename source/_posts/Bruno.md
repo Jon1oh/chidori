@@ -3,7 +3,7 @@ title: Bruno
 date: 2026-02-24 20:45:15
 categories: ["VulnLab"]
 tags: ["DLL Hijacking", "FTP Anonymous Login", "Kerberos Authentication Misconfiguration", "Zip Slip"]
-cover: https://assets.vulnlab.com/bruno_slide.png
+cover: images\Bruno\bruno_vl.png
 ---
 # TLDR
 Enumerate the domain and perform DLL Hijacking to access the domain.

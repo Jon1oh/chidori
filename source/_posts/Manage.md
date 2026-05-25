@@ -3,7 +3,7 @@ title: Manage
 date: 2026-01-27 15:56:29
 categories: ["VulnLab"]
 tags: ["Java RMI", "Information Disclosure", "Insecure User Permissions"]
-cover: https://assets.vulnlab.com/manage_slide.png
+cover: images\Manage\manage_vl.png
 ---
 
 # TLDR
