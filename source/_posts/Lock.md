@@ -436,9 +436,9 @@ nt authority\system
 - We now have SYSTEM privileges on `lock.vl` and can find `root.txt` in the Administrator's Desktop.
 
 # References
-[seriotonctf VL-Lock blog](https://seriotonctf.github.io/Lock-Vulnlab/)
-[purplestormctf VL-Lock blog](https://github.com/purplestormctf/Writeups/blob/main/vulnlab/machines/Lock/Lock.md#port-scanning)
-[panosoikogr.github.io VL-Lock blog](https://panosoikogr.github.io/2025/03/10/VL-Lock/#PDF24-CVE-2023-49147)
-[PyCryptoDome Documentation](https://pycryptodome-master.readthedocs.io/en/latest/src/installation.html)
-[CVE-2023-49147 PoC](https://sec-consult.com/vulnerability-lab/advisory/local-privilege-escalation-via-msi-installer-in-pdf24-creator-geek-software-gmbh/)
+1. [seriotonctf VL-Lock blog](https://seriotonctf.github.io/Lock-Vulnlab/)
+2. [purplestormctf VL-Lock blog](https://github.com/purplestormctf/Writeups/blob/main/vulnlab/machines/Lock/Lock.md#port-scanning)
+3. [panosoikogr.github.io VL-Lock blog](https://panosoikogr.github.io/2025/03/10/VL-Lock/#PDF24-CVE-2023-49147)
+4. [PyCryptoDome Documentation](https://pycryptodome-master.readthedocs.io/en/latest/src/installation.html)
+5. [CVE-2023-49147 PoC](https://sec-consult.com/vulnerability-lab/advisory/local-privilege-escalation-via-msi-installer-in-pdf24-creator-geek-software-gmbh/)
 
